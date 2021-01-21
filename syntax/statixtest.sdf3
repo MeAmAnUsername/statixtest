@@ -14,6 +14,9 @@ context-free sorts
   Substitution
   Node
   NodeDeclaration
+  Decl
+  NodeId
+  ATerm
 
 context-free syntax
   
@@ -30,20 +33,35 @@ context-free syntax
 
   Substitution.Substitution = [[ID] |-> [NONEWLINE]]
   
-  Node.Declaration = [[DECLID] : [NONEWLINE] {
-  }]
+  Node.Declaration = [[DECLID] : [ATerm] {
+  }] {prefer}
   Node.Scope = [[SCOPEID] : [SCOPEID] {
     [{NodeDeclaration "\n"}*]
   }]
+  Node.PrettyScope = [[SCOPEID] {
+    [{NodeDeclaration "\n"}*]
+  }]
 
-  NodeDeclaration.NodeDeclaration = [[PATH]![ID] : [{NODEID "\n"}+]]
+  NodeDeclaration.NodeDeclaration = [[PATH]![ID] : [{Decl "\n"}+]]
+  
+  Decl.Ref = [[NodeId]] {prefer}
+  Decl.ATerm = [[ATerm]]
+
+  NodeId.DeclId = [[DECLID]] {prefer}
+  NodeId.ScopeId = [[SCOPEID]]
+
+  ATerm.String = [[STRING]]
+  ATerm.Int = [[INT]]
+  ATerm.ScopeRef = [[SCOPEID]]
+  ATerm.List = <[<{ATerm ", "}*>]>
+  ATerm.Tuple = [([{ATerm ", "}*])]
+  ATerm.Constructor = [[ID]([{ATerm ", "}*])]
 
 lexical sorts
 
   NONEWLINE
   DECLID
   SCOPEID
-  NODEID
   PATH
   REST
 
@@ -51,8 +69,6 @@ lexical syntax
 
   NONEWLINE = (~[\r\n])+
   DECLID = "#-d_" INT "-" INT
-  SCOPEID = "#-" ID "-" INT
-  NODEID = DECLID
-  NODEID = SCOPEID
+  SCOPEID = "#-" ID "-" INT // todo: make non-ambiguous with DECLID
   PATH = ID ("/" ID)*
   REST = (~[])+ EOF
