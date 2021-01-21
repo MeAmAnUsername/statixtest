@@ -1,0 +1,33 @@
+module gen/prettyprint
+
+imports
+
+  signatures/statixtest-sig
+  pp
+
+rules
+
+  editor-merge-decls: (_, _, ast, path, project-path) -> (filename, result)
+    with
+      filename := <guarantee-extension(|"pp.stxresult")> path
+    ; result := <prettyprint> <merge-decls> ast
+
+  merge-decls: Program(substitutions, nodes, rest) -> Program(substitutions, <merge-nodes> nodes, rest)
+  prettyprint = pp-statixtest-string
+
+  merge-nodes: nodes -> <map-param(decl-to-direct|nodes)> nodes
+
+  decl-to-direct(|nodes): decl@ATerm(_) -> decl
+  decl-to-direct(|nodes): Ref(name) -> <filter-param(node-decl-matches-id|name)> nodes
+
+  node-decl-matches-id(|name): d@Declaration(name, _) -> d
+  node-decl-matches-id(|name): s@Scope(name, _, _) -> s
+  node-decl-matches-id(|name): ps@PrettyScope(name, _) -> ps
+
+rules // util
+
+  map-param(s|arg) = 
+    rec x([] + [s(|arg) | x])
+
+  filter-param(s|arg) =
+    [] + [s(|arg) | filter-param(s|arg)] <+ ?[_ | <filter-param(s|arg)> ]
