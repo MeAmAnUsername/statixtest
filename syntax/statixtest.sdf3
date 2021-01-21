@@ -1,0 +1,58 @@
+module statixtest
+
+imports
+  
+  Common
+
+context-free start-symbols
+  
+  Start
+
+context-free sorts
+
+  Start
+  Substitution
+  Node
+  NodeDeclaration
+
+context-free syntax
+  
+  Start.Program =
+  [substitution
+    [{Substitution "\n"}*]
+  
+  analysis
+    scope graph
+      [{Node "\n"}*]
+
+  errors
+  [REST]]
+
+  Substitution.Substitution = [[ID] |-> [NONEWLINE]]
+  
+  Node.Declaration = [[DECLID] : [NONEWLINE] {
+  }]
+  Node.Scope = [[SCOPEID] : [SCOPEID] {
+    [{NodeDeclaration "\n"}*]
+  }]
+
+  NodeDeclaration.NodeDeclaration = [[PATH]![ID] : [{NODEID "\n"}+]]
+
+lexical sorts
+
+  NONEWLINE
+  DECLID
+  SCOPEID
+  NODEID
+  PATH
+  REST
+
+lexical syntax
+
+  NONEWLINE = (~[\r\n])+
+  DECLID = "#-d_" INT "-" INT
+  SCOPEID = "#-" ID "-" INT
+  NODEID = DECLID
+  NODEID = SCOPEID
+  PATH = ID ("/" ID)*
+  REST = (~[])+ EOF

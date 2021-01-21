@@ -1,0 +1,49 @@
+module pp
+
+imports
+
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/editor/refactoring/-
+  pp/statixtest-parenthesize
+  pp/statixtest-pp
+
+rules
+
+  editor-format:
+    (node, _, ast, path, project-path) -> (filename, result)
+    with
+      ext      := <get-extension> path
+    ; filename := <guarantee-extension(|$[pp.[ext]])> path
+    ; result   := <pp-debug> node
+
+rules
+  
+  pp-statixtest-string =
+    parenthesize-statixtest
+    ; prettyprint-statixtest-start-symbols
+    ; !V([], <id>)
+    ; box2text-string(|120)
+      
+  pp-partial-statixtest-string =
+    parenthesize-statixtest
+    ; prettyprint-statixtest
+    ; !V([], <id>)
+    ; box2text-string(|120)
+    
+  pp-partial-statixtest-string(|sort) =
+    parenthesize-statixtest
+    ; prettyprint-statixtest(|sort)
+    ; !V([], <id>)
+    ; box2text-string(|120)  
+      
+  pp-debug :
+    ast -> result
+    with
+       result := <pp-statixtest-string> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-statixtest-string); debug(!"cannot pp ")))> ast
+    ;  result := ""
+
+rules
+  
+  construct-textual-change = construct-textual-change(pp-partial-statixtest-string, parenthesize, override-reconstruction, resugar)
