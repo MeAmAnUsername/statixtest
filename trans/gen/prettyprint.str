@@ -4,30 +4,54 @@ imports
 
   signatures/statixtest-sig
   pp
+  libspoofax/stratego/debug
 
 rules
 
   editor-merge-decls: (_, _, ast, path, project-path) -> (filename, result)
     with
-      filename := <guarantee-extension(|"pp.stxresult")> path
-    ; result := <prettyprint> <merge-decls> ast
+      filename    := <guarantee-extension(|"pp.stxresult")> path
+    ; transformed := <merge-decls> ast
+    ; <ppdebugna(|"Successfully merged decls, transformed: ")> transformed
+    ; result      := <prettyprint> transformed
 
   merge-decls: Program(substitutions, nodes, rest) -> Program(substitutions, <merge-nodes> nodes, rest)
   prettyprint = pp-statixtest-string
 
-  merge-nodes: nodes -> <map-param(decl-to-direct|nodes)> nodes
+  merge-nodes: nodes -> result
+    with
+      result := <map-param(inline-scope-decls|<filter(?Declaration(_, _))> nodes)> <filter(not(?Declaration(_, _)))> nodes
 
-  decl-to-direct(|nodes): decl@ATerm(_) -> decl
-  decl-to-direct(|nodes): Ref(name) -> <filter-param(node-decl-matches-id|name)> nodes
+  inline-scope-decls(|nodes): Scope(name, _, decls)    -> PrettyScope(name, <map-param(inline-node-decl|nodes)> decls)
+  inline-scope-decls(|nodes): PrettyScope(name, decls) -> PrettyScope(name, <map-param(inline-node-decl|nodes)> decls)
 
-  node-decl-matches-id(|name): d@Declaration(name, _) -> d
-  node-decl-matches-id(|name): s@Scope(name, _, _) -> s
-  node-decl-matches-id(|name): ps@PrettyScope(name, _) -> ps
+  inline-node-decl(|nodes): NodeDeclaration(path, name, decls) -> NodeDeclaration(path, name, <map-param(decl-ref-to-direct|nodes)> decls)
+//    with
+//      <debug(|$[inlining decls: ])> decls
+
+  decl-ref-to-direct(|nodes): decl@ATerm(_) -> decl
+  decl-ref-to-direct(|nodes): decl@Ref(ScopeId(_)) -> decl
+  decl-ref-to-direct(|nodes): Ref(DeclId(name)) -> result
+    with
+      <ppdebugna(|"decl-ref-to-direct(|nodes): ")> "Ref(DeclId(name)) -> result"
+    ; <ppdebugna(|"nodes: ")> nodes
+    ; <ppdebugna(|"name: ")> name
+    ; result := ATerm(<getfirst-param(node-decl-matches-id|name)> nodes)
+    ; <ppdebugna(|"result: ")> result
+
+  node-decl-matches-id(|name1): Declaration(name2, body) -> body where <str-equal> (name1, name2)
+//  node-decl-matches-id(|name1): Scope(name2, _, _) -> s where <str-equal> (name1, name2)
+//  node-decl-matches-id(|name1): PrettyScope(name2, _) -> ps where <str-equal> (name1, name2)
+
+  str-equal: (name1, name2) -> <equal> (<strip-annos> name1, <strip-annos> name2)
 
 rules // util
 
   map-param(s|arg) = 
     rec x([] + [s(|arg) | x])
 
-  filter-param(s|arg) =
-    [] + [s(|arg) | filter-param(s|arg)] <+ ?[_ | <filter-param(s|arg)> ]
+// todo: remove
+//  filter-param(s|arg) =
+//    [] + [s(|arg) | filter-param(s|arg)] <+ ?[_ | <filter-param(s|arg)> ]
+
+  getfirst-param(s|arg) = rec x(Hd; s(|arg) <+ Tl; x)
