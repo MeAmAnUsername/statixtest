@@ -39,7 +39,7 @@ rules
     ; result := ATerm(<getfirst-param(node-decl-matches-id|name)> nodes)
     ; <ppdebugna(|"result: ")> result
 
-  node-decl-matches-id(|name1): Declaration(name2, body) -> body where <str-equal> (name1, name2)
+  node-decl-matches-id(|name1): Declaration(name2, body) -> body where <equal-ignore-annos> (name1, name2)
 
 rules // util
 
@@ -48,5 +48,5 @@ rules // util
 
   getfirst-param(s|arg) = rec x(Hd; s(|arg) <+ Tl; x)
 
-  // Compares two strings for equality, ignoring annotations
-  str-equal: (name1, name2) -> <equal> (<strip-annos> name1, <strip-annos> name2)
+  // Compares two terms for equality, ignoring annotations
+  equal-ignore-annos: (name1, name2) -> <equal> (<strip-annos> name1, <strip-annos> name2)
