@@ -40,18 +40,13 @@ rules
     ; <ppdebugna(|"result: ")> result
 
   node-decl-matches-id(|name1): Declaration(name2, body) -> body where <str-equal> (name1, name2)
-//  node-decl-matches-id(|name1): Scope(name2, _, _) -> s where <str-equal> (name1, name2)
-//  node-decl-matches-id(|name1): PrettyScope(name2, _) -> ps where <str-equal> (name1, name2)
-
-  str-equal: (name1, name2) -> <equal> (<strip-annos> name1, <strip-annos> name2)
 
 rules // util
 
   map-param(s|arg) = 
     rec x([] + [s(|arg) | x])
 
-// todo: remove
-//  filter-param(s|arg) =
-//    [] + [s(|arg) | filter-param(s|arg)] <+ ?[_ | <filter-param(s|arg)> ]
-
   getfirst-param(s|arg) = rec x(Hd; s(|arg) <+ Tl; x)
+
+  // Compares two strings for equality, ignoring annotations
+  str-equal: (name1, name2) -> <equal> (<strip-annos> name1, <strip-annos> name2)
