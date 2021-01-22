@@ -4,7 +4,6 @@ imports
 
   signatures/statixtest-sig
   pp
-  libspoofax/stratego/debug
 
 rules
 
@@ -12,7 +11,6 @@ rules
     with
       filename    := <guarantee-extension(|"pp.stxresult")> path
     ; transformed := <merge-decls> ast
-    ; <ppdebugna(|"Successfully merged decls, transformed: ")> transformed
     ; result      := <prettyprint> transformed
 
   merge-decls: Program(substitutions, nodes, rest) -> Program(substitutions, <merge-nodes> nodes, rest)
@@ -26,18 +24,12 @@ rules
   inline-scope-decls(|nodes): PrettyScope(name, decls) -> PrettyScope(name, <map-param(inline-node-decl|nodes)> decls)
 
   inline-node-decl(|nodes): NodeDeclaration(path, name, decls) -> NodeDeclaration(path, name, <map-param(decl-ref-to-direct|nodes)> decls)
-//    with
-//      <debug(|$[inlining decls: ])> decls
 
   decl-ref-to-direct(|nodes): decl@ATerm(_) -> decl
   decl-ref-to-direct(|nodes): decl@Ref(ScopeId(_)) -> decl
   decl-ref-to-direct(|nodes): Ref(DeclId(name)) -> result
     with
-      <ppdebugna(|"decl-ref-to-direct(|nodes): ")> "Ref(DeclId(name)) -> result"
-    ; <ppdebugna(|"nodes: ")> nodes
-    ; <ppdebugna(|"name: ")> name
-    ; result := ATerm(<getfirst-param(node-decl-matches-id|name)> nodes)
-    ; <ppdebugna(|"result: ")> result
+      result := ATerm(<getfirst-param(node-decl-matches-id|name)> nodes)
 
   node-decl-matches-id(|name1): Declaration(name2, body) -> body where <equal-ignore-annos> (name1, name2)
 
