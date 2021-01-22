@@ -25,4 +25,5 @@ menus
 
   menu: "Generate" (openeditor)
 
-    action: "Merge declarations into scopes" = editor-merge-decls
+    action: "Merge declarations into scopes in this file" = editor-merge-decls-same-file
+    action: "Merge declarations into scopes in new file" = editor-merge-decls-new-file

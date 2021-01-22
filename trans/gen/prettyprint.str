@@ -7,10 +7,15 @@ imports
 
 rules
 
-  editor-merge-decls: (_, _, ast, path, project-path) -> (filename, result)
+  editor-merge-decls-new-file: (_, _, ast, path, project-path) -> (filename, result)
     with
       filename    := <guarantee-extension(|"pp.stxresult")> path
     ; transformed := <merge-decls> ast
+    ; result      := <prettyprint> transformed
+
+  editor-merge-decls-same-file: (_, _, ast, path, project-path) -> (path, result)
+    with
+      transformed := <merge-decls> ast
     ; result      := <prettyprint> transformed
 
   merge-decls: Program(substitutions, nodes, rest) -> Program(substitutions, <merge-nodes> nodes, rest)
