@@ -11,46 +11,38 @@ context-free start-symbols
 context-free sorts
 
   Start
-  Substitution
-  Node
-  NodeDeclaration
-  Decl
-  NodeId
-  ATerm
+  // todo
 
 context-free syntax
   
-  Start.Program = [
+  Start = ScopeGraph
+  Start.StxResult = [
   substitution
     [{Substitution "\n"}*]
   
   analysis
-    scope graph
-      [{Node "\n"}*]
+    [ScopeGraph]
 
   errors
     [REST]]
 
   Substitution.Substitution = [[ID] |-> [NONEWLINE]]
   
-  Node.Declaration = [[DECLID] : [ATerm] {
-  }] {prefer}
-  Node.Scope = [[SCOPEID] : [SCOPEID] {
-    [{NodeDeclaration "\n"}*]
-  }]
-  Node.PrettyScope = [[SCOPEID] {
-    [{NodeDeclaration "\n"}*]
-  }]
-
-  NodeDeclaration.NodeDeclaration = [[PATH]![ID] : [{Decl "\n"}+]]
+  ScopeGraph.ScopeGraph = [
+    scope graph
+      [{Scope "\n"}*]]
   
-  Decl.Ref = [[NodeId]] {prefer}
-  Decl.ATerm = [[ATerm]]
+  Scope.Scope = [[SCOPEID] {
+    [{ScopeElement "\n"}*]
+  }]
+  
+  ScopeElement.ScopeElement = [[ID] {
+    [{NodeDeclaration "\n"}*]
+  }]
 
-  NodeId.DeclId = [[DECLID]] {prefer}
-  NodeId.ScopeId = [[SCOPEID]]
+  NodeDeclaration.NodeDeclaration = [[PATH]![ID] : [{ATerm "\n"}+]]
 
-  ATerm.String = [[STRING]]
+  ATerm.String = [[UNQUOTED_STRING]] {avoid}
   ATerm.Int = [[INT]]
   ATerm.ScopeRef = [[SCOPEID]]
   ATerm.List = <[<{ATerm ", "}*>]>
@@ -60,15 +52,21 @@ context-free syntax
 lexical sorts
 
   NONEWLINE
-  DECLID
   SCOPEID
   PATH
+  PATHID
+  UNQUOTED_STRING
   REST
 
 lexical syntax
 
   NONEWLINE = (~[\r\n])+
-  DECLID = "#-d_" INT "-" INT
-  SCOPEID = "#-" ID "-" INT // todo: make non-ambiguous with DECLID
-  PATH = ID ("/" ID)*
+  SCOPEID = "#" PATH? "-" ID "-" INT
+  PATH = PATHID ("/" PATHID)*
+  PATHID = [A-Za-z0-9\_\-\.]+
+  UNQUOTED_STRING = ~[\,\)\}\n\/]+
   REST = (~[])+ EOF
+
+lexical restrictions
+
+  UNQUOTED_STRING -/- ~[\,\)\}\n\/]
