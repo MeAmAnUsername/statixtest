@@ -11,7 +11,12 @@ context-free start-symbols
 context-free sorts
 
   Start
-  // todo
+  Substitution
+  ScopeGraph
+  Scope
+  ScopeElement
+  Declaration
+  ATerm
 
 context-free syntax
   
@@ -37,10 +42,10 @@ context-free syntax
   }]
   
   ScopeElement.ScopeElement = [[ID] {
-    [{NodeDeclaration "\n"}*]
+    [{Declaration "\n"}*]
   }]
 
-  NodeDeclaration.NodeDeclaration = [[PATH]![ID] : [{ATerm "\n"}+]]
+  Declaration.Declaration = [[PATH]![ID] : [{ATerm "\n"}+]]
 
   ATerm.String = [[UNQUOTED_STRING]] {avoid}
   ATerm.Int = [[INT]]

@@ -6,70 +6,65 @@ imports
 
 signature
   relations
-    id : string -> Node
+    snopes : SCOPEID -> Scope
 
 rules
 
   programOk : Start
 
-  programOk(Program(_, nodes, _)) :- {s_program}
-    new s_program,
-    nodesOk(s_program, nodes).
+  programOk(StxResult(_, scope_graph, _)) :- {s_root}
+    new s_root,
+    scopeGraphOk(s_root, scope_graph).
+  programOk(ScopeGraph2Start(scope_graph)) :- {s_root}
+    new s_root,
+    scopeGraphOk(s_root, scope_graph).
 
-  nodeOk : scope * Node
-  nodesOk maps nodeOk(*, list(*))
-  nodeOk(s, d@Declaration(id, body)) :-
-    declareId(s, id, d),
-    atermOk(s, body).
-  nodeOk(s, sc@Scope(id1, id2, decls)) :-
-    declareId(s, id1, sc),
-    nodeDeclarationsOk(s, decls),
-    try {id1 == id2} | warning "name mismatch" @id2.
-  nodeOk(s, ps@PrettyScope(id, decls)) :-
-    declareId(s, id, ps),
-    nodeDeclarationsOk(s, decls).
+  scopeGraphOk : scope * ScopeGraph
+  scopeGraphOk(s, ScopeGraph(scopes)) :-
+    scopesOk(s, scopes).
 
-  nodeDeclarationOk : scope * NodeDeclaration
-  nodeDeclarationsOk maps nodeDeclarationOk(*, list(*))
-  nodeDeclarationOk(s, NodeDeclaration(_, _, decls)) :-
+  scopeOk : scope * Scope
+  scopesOk maps scopeOk(*, list(*))
+  scopeOk(s, sc@Scope(id, elems)) :-
+    declareScope(s, id, sc),
+    scopeElementsOk(s, elems).
+
+  scopeElementOk : scope * ScopeElement
+  scopeElementsOk maps scopeElementOk(*, list(*))
+  scopeElementOk(s, ScopeElement(_, decls)) :-
     declarationsOk(s, decls).
 
-  declarationOk : scope * Decl
+  declarationOk : scope * Declaration
   declarationsOk maps declarationOk(*, list(*))
-  declarationOk(s, ATerm(aterm)) :- atermOk(s, aterm).
-  declarationOk(s, Ref(node_id)) :- resolveUniqueId(s, getId(node_id)) == _.
+  declarationOk(s, Declaration(_, _, aterm)) :- atermsOk(s, aterm).
   
-    getId : NodeId -> string
-    getId(DeclId(id)) = id.
-    getId(ScopeId(id)) = id.
-
   atermOk : scope * ATerm
   atermsOk maps atermOk(*, list(*))
   atermOk(s, String(_)).
   atermOk(s, Int(_)).
-  atermOk(s, ScopeRef(id)) :- resolveUniqueId(s, id) == _.
+  atermOk(s, ScopeRef(id)) :- resolveUniqueScope(s, id) == _.
   atermOk(s, List(elems)) :- atermsOk(s, elems).
   atermOk(s, Tuple(elems)) :- atermsOk(s, elems).
   atermOk(s, Constructor(name, args)) :- atermsOk(s, args).
 
 rules // declaration and resolution
 
-  declareId : scope * string * Node
-  declareId(s, id, node) :-
-    !id[id, node] in s,
-    resolveId(s, id) == [_] | error $[duplicate id [id]].
+  declareScope : scope * SCOPEID * Scope
+  declareScope(s, id, snope) :-
+    !snopes[id, snope] in s,
+    resolveScope(s, id) == [_] | error $[duplicate scope id [id]].
 
-  resolveId : scope * string -> list((string * Node))
-  resolveId(s, id) = getNodes(occs) :-
-    query id
+  resolveScope : scope * SCOPEID -> list((SCOPEID * Scope))
+  resolveScope(s, id) = getScopes(occs) :-
+    query snopes
       filter e and {id' :- id' == id}
       in s |-> occs.
 
-    getNode : (path * (string * Node)) -> (string * Node)
-    getNodes maps getNode(list(*)) = list(*)
-    getNode((_, node)) = node.
+    getScope : (path * (SCOPEID * Scope)) -> (SCOPEID * Scope)
+    getScopes maps getScope(list(*)) = list(*)
+    getScope((_, snope)) = snope.
 
-  resolveUniqueId : scope * string -> Node
-  resolveUniqueId(s, id) = node :- {id_orig}
-    resolveId(s, id) == [(id_orig, node)] | error $[Cannot resolve [id]] @id,
+  resolveUniqueScope : scope * SCOPEID -> Scope
+  resolveUniqueScope(s, id) = snope :- {id_orig}
+    resolveScope(s, id) == [(id_orig, snope)] | error $[Cannot resolve scope [id]] @id,
     @id.ref := id_orig.
