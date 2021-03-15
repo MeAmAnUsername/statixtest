@@ -1,0 +1,20 @@
+module format
+
+imports
+
+  signatures/statixtest-sig
+  pp
+
+rules
+
+  editor-remove-empty: (_, _, ast, path, project-path) -> (path, result)
+    with
+      transformed := <topdown(try(remove-empty-elements))> ast
+    ; result      := <prettyprint> transformed
+
+  prettyprint = pp-statixtest-string
+
+  remove-empty-elements: Scope(scopeid, elements) -> Scope(scopeid, <filter(not(is-empty-element))> elements)
+
+  // only succeeds if the list is empty
+  is-empty-element: elem@ScopeElement(_, []) -> elem
