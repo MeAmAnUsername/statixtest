@@ -47,7 +47,7 @@ context-free syntax
 
   Declaration.Declaration = [[PATH]![ID] : [{ATerm "\n"}+]]
 
-  ATerm.String = [[UNQUOTED_STRING]] {avoid}
+  ATerm.String = [[STRING]]
   ATerm.Int = [[INT]]
   ATerm.ScopeRef = [[SCOPEID]]
   ATerm.List = <[<{ATerm ", "}*>]>
@@ -60,7 +60,6 @@ lexical sorts
   SCOPEID
   PATH
   PATHID
-  UNQUOTED_STRING
   REST
 
 lexical syntax
@@ -69,9 +68,4 @@ lexical syntax
   SCOPEID = "#" PATH? "-" ID "-" INT
   PATH = PATHID ("/" PATHID)*
   PATHID = [A-Za-z0-9\_\-\.]+
-  UNQUOTED_STRING = ~[\,\)\}\n\/]+
   REST = (~[])+ EOF
-
-lexical restrictions
-
-  UNQUOTED_STRING -/- ~[\,\)\}\n\/]
