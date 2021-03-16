@@ -7,6 +7,11 @@ imports
 
 rules
 
+  editor-format: (_, _, ast, path, project-path) -> (path, result)
+    with
+      transformed := <topdown(try(remove-empty-elements <+ replace-HTML))> ast
+    ; result      := <prettyprint> transformed
+
   editor-remove-empty: (_, _, ast, path, project-path) -> (path, result)
     with
       transformed := <topdown(try(remove-empty-elements))> ast

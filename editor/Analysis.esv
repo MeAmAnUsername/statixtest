@@ -25,5 +25,6 @@ menus
 
   menu: "Format" (openeditor)
 
-    action: "Remove empty elements in scopes" = editor-remove-empty
-    action: "Replace HTML codes"              = editor-replace-HTML
+    action: "Format (execute all actions in this menu)" = editor-format
+    action: "Remove empty elements in scopes"           = editor-remove-empty
+    action: "Replace HTML codes"                        = editor-replace-HTML
