@@ -49,15 +49,19 @@ context-free syntax
 
   ATerm.String = [[STRING]]
   ATerm.Int = [[INT]]
-  ATerm.ScopeRef = [[SCOPEID]]
+  ATerm.ScopeRef = [[ScopeRef]]
   ATerm.List = <[<{ATerm ", "}*>]>
   ATerm.Tuple = [([{ATerm ", "}*])]
   ATerm.Constructor = [[ID]([{ATerm ", "}*])]
+
+  ScopeRef.Resolved = [[SCOPEID]]
+  ScopeRef.Unresolved = [[UNRESOLVED_SCOPEID]]
 
 lexical sorts
 
   NONEWLINE
   SCOPEID
+  UNRESOLVED_SCOPEID
   PATH
   PATHID
   REST
@@ -65,7 +69,8 @@ lexical sorts
 lexical syntax
 
   NONEWLINE = (~[\r\n])+
-  SCOPEID = "#" PATH? "-" ID "-" INT
+  SCOPEID            = "#" PATH? "-" ID "-" INT
+  UNRESOLVED_SCOPEID = "?" PATH? "-" ID "-" INT
   PATH = PATHID ("/" PATHID)*
   PATHID = [A-Za-z0-9\_\-\.]+
   REST = (~[])+ EOF

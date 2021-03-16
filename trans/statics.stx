@@ -42,7 +42,8 @@ rules
   atermsOk maps atermOk(*, list(*))
   atermOk(s, String(_)).
   atermOk(s, Int(_)).
-  atermOk(s, ScopeRef(id)) :- resolveUniqueScope(s, id) == _.
+  atermOk(s, ScopeRef(Resolved(id))) :- resolveUniqueScope(s, id) == _.
+  atermOk(s, ScopeRef(Unresolved(id))).
   atermOk(s, List(elems)) :- atermsOk(s, elems).
   atermOk(s, Tuple(elems)) :- atermsOk(s, elems).
   atermOk(s, Constructor(name, args)) :- atermsOk(s, args).
