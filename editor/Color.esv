@@ -1,0 +1,4 @@
+module color
+
+colorer
+  UNRESOLVED_SCOPEID : orange
