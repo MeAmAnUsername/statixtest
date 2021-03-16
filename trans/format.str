@@ -12,9 +12,26 @@ rules
       transformed := <topdown(try(remove-empty-elements))> ast
     ; result      := <prettyprint> transformed
 
+  editor-replace-HTML: (_, _, ast, path, project-path) -> (path, result)
+    with
+      transformed := <topdown(try(replace-HTML))> ast
+    ; result      := <prettyprint> transformed
+
   prettyprint = pp-statixtest-string
 
   remove-empty-elements: Scope(scopeid, elements) -> Scope(scopeid, <filter(not(is-empty-element))> elements)
 
   // only succeeds if the list is empty
   is-empty-element: elem@ScopeElement(_, []) -> elem
+
+
+  replace-HTML: string ->
+    <string-replace(|"&amp;", "&")>
+    <string-replace(|"&lt;", "<")>
+    <string-replace(|"&gt;", ">")>
+    <string-replace(|"&quot;", "\"")>
+    <string-replace(|"&apos;", "'")>
+    <string-replace(|"&nbsp;", " ")>
+    <string-replace(|"<br>", "")>
+    string
+    where <is-string> string

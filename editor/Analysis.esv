@@ -26,3 +26,4 @@ menus
   menu: "Format" (openeditor)
 
     action: "Remove empty elements in scopes" = editor-remove-empty
+    action: "Replace HTML codes"              = editor-replace-HTML
