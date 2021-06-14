@@ -45,7 +45,10 @@ context-free syntax
     [{Declaration "\n"}*]
   }]
 
-  Declaration.Declaration = [[PATH]![ID] : [{ATerm "\n"}+]]
+  Declaration.Declaration = [[IdOptionalPath] : [{ATerm "\n"}+]]
+
+  IdOptionalPath.NoPath = [[ID]]
+  IdOptionalPath.WithPath = [[PATH]![ID]]
 
   ATerm.String = [[STRING]]
   ATerm.Int = [[INT]]
