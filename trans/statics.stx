@@ -36,7 +36,7 @@ rules
 
   declarationOk : scope * Declaration
   declarationsOk maps declarationOk(*, list(*))
-  declarationOk(s, Declaration(_, _, aterm)) :- atermsOk(s, aterm).
+  declarationOk(s, Declaration(_, aterm)) :- atermsOk(s, aterm).
   
   atermOk : scope * ATerm
   atermsOk maps atermOk(*, list(*))
