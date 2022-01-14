@@ -20,13 +20,22 @@ rules
   with
     nodes := <map(scope-to-json-node); to-json-list> scopes
   ; links := <map(scope-to-json-links); concat; to-json-list> scopes
-    
-  scope-to-json-node: Scope(name, _) -> $[{"id": "[name]"}]
+
+  scope-to-json-node: Scope(name, elems) -> $[{"id": "[name]", "relations": [relations]}]
+  with
+    relations := <filter(scope-elem-is-relations); concat; map(relation-to-json); to-json-list> elems
   scope-to-json-links: Scope(name, elems) -> 
     <filter(scope-elem-is-edges); concat; map-with-param(edge-to-json-link|name)> elems
 
+  scope-elem-is-relations: ScopeElement("relations", relations) -> relations
   scope-elem-is-edges: ScopeElement("edges", edges) -> edges
   
+  relation-to-json: Declaration(id_path, elems) -> result
+  with
+    name    := <idpath-to-id> id_path
+  ; values := <map(aterm-to-json); to-json-list> elems
+  ; result  := $[{"name": "[name]", "values": [values]}]
+
   edge-to-json-link(|source): Declaration(id_path, [ScopeRef(scope_name)]) -> result
   with
     label  := <idpath-to-id> id_path
@@ -35,7 +44,14 @@ rules
 
   idpath-to-id: WithPath(_, name) -> name
   idpath-to-id: NoPath(name) -> name
-  
+
+  aterm-to-json: String(str) -> $[{"type": "String", "value": [str]}]
+  aterm-to-json: Int(val) -> $[{"type": "Int", "value": [val]}]
+  aterm-to-json: ScopeRef(ref) -> $[{"type": "ScopeRef", "value": "[<scoperef-to-id> ref]"}]
+  aterm-to-json: List(elems) -> $[{"type": "List", "value": [<map(aterm-to-json); to-json-list> elems]}]
+  aterm-to-json: Tuple(elems) -> $[{"type": "Tuple", "value": [<map(aterm-to-json); to-json-list> elems]}]
+  aterm-to-json: Constructor(name, args) -> $[{"type": "Constructor", "value": {"name": "[name]", "arguments": [<map(aterm-to-json); to-json-list> args]}}]
+
   scoperef-to-id: Resolved(name) -> name
   scoperef-to-id: Unresolved(name) -> name
 
