@@ -39,13 +39,15 @@ context-free syntax
     scope graph
       [{Scope "\n"}*]]
   
-  Scope.Scope = [[SCOPEID] {
-    [{ScopeElement "\n"}*]
-  }]
+  Scope.Scope = [
+    [SCOPEID] {
+      [{ScopeElement "\n"}*]
+    }]
   
-  ScopeElement.ScopeElement = [[ID] {
-    [{Declaration "\n"}*]
-  }]
+  ScopeElement.ScopeElement = [
+    [ID] {
+      [{Declaration "\n"}*]
+    }]
 
   Declaration.Declaration = [[IdOptionalPath] : [{ATerm "\n"}+]]
 
