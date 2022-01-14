@@ -10,6 +10,9 @@ Secondly, it adds menu entries in `Spoofax > Format`
 - `Replace HTML codes` replaces HTML codes in `.stxresult` errors, warnings and
    notes with their proper characters.
 
+Finally, it can generate a JSON representation of the scope graph, which can be used in the scope graph visualizer.
+This can be found in `Spoofax > Generate > JSON`.
+
 # Instructions
 Using this project is easy: just load it in Spoofax and it will automagically
 work.
