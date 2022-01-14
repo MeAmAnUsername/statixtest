@@ -4,9 +4,9 @@ of Statix test result files (`.stxresult`) and scope graph files (`.scopegraph`)
 Firstly, it allows following references to scopes in the scope graph by
 CTRL/CMD+clicking the reference.
 Secondly, it adds menu entries in `Spoofax > Format`
-- `Format` executes all other formatting actions from `Spoofax > Format`
+- `Format` executes all other formatting actions from `Spoofax > Format`.
 - `Remove empty elements in scopes` removes empty sets in scopes, e.g. if a
-   scope doesn't have edges it will remove. `edges { }`
+   scope doesn't have edges it will remove `edges { }`.
 - `Replace HTML codes` replaces HTML codes in `.stxresult` errors, warnings and
    notes with their proper characters.
 
