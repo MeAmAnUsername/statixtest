@@ -1,0 +1,48 @@
+module gen/json
+
+imports
+
+  signatures/statixtest-sig
+
+rules
+
+  editor-to-json: (_, _, ast, path, project-path) -> (filename, result)
+    with
+      filename    := <guarantee-extension(|"json")> path
+    ; result      := <to-json> ast
+
+rules
+
+  to-json: StxResult(_, scope_graph, _) -> <to-json> scope_graph
+  to-json: ScopeGraph(scopes) -> <scopes-to-json> scopes
+
+  scopes-to-json: scopes -> $[{"nodes": [[nodes]], "links": [[links]]}]
+  with
+    nodes := <map(scope-to-json-node); to-json-list> scopes
+  ; links := <map(scope-to-json-links); concat; to-json-list> scopes
+    
+  scope-to-json-node: Scope(name, _) -> $[{"id": "[name]"}]
+  scope-to-json-links: Scope(name, elems) -> 
+    <filter(scope-elem-is-edges); concat; map-with-param(edge-to-json-link|name)> elems
+
+  scope-elem-is-edges: ScopeElement("edges", edges) -> edges
+  
+  edge-to-json-link(|source): Declaration(id_path, [ScopeRef(scope_name)]) -> result
+  with
+    label  := <idpath-to-id> id_path
+  ; target := <scoperef-to-id> scope_name
+  ; result := $[{"source": "[source]", "target": "[target]", "label": "[label]"}]
+
+  idpath-to-id: WithPath(_, name) -> name
+  idpath-to-id: NoPath(name) -> name
+  
+  scoperef-to-id: Resolved(name) -> name
+  scoperef-to-id: Unresolved(name) -> name
+
+  // takes a list of strings and returns a single string representing a JSON list
+  to-json-list: lst -> <concat; concat-strings> [["["], <separate-by(|", ")> lst, ["]"]]
+  
+
+  // map with a parameter
+  map-with-param(strat|param): [] -> []
+  map-with-param(strat|param): [hd|tl] -> [<strat(|param)> hd | <map-with-param(strat|param)> tl]

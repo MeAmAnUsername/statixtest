@@ -28,3 +28,7 @@ menus
     action: "Format (execute all actions in this menu)" = editor-format
     action: "Remove empty elements in scopes"           = editor-remove-empty
     action: "Replace HTML codes"                        = editor-replace-HTML
+
+  menu: "Generate" (openeditor)
+
+    action: "JSON" = editor-to-json
