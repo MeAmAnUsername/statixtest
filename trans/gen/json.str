@@ -16,7 +16,7 @@ rules
   to-json: StxResult(_, scope_graph, _) -> <to-json> scope_graph
   to-json: ScopeGraph(scopes) -> <scopes-to-json> scopes
 
-  scopes-to-json: scopes -> $[{"nodes": [[nodes]], "links": [[links]]}]
+  scopes-to-json: scopes -> $[{"nodes": [nodes], "links": [links]}]
   with
     nodes := <map(scope-to-json-node); to-json-list> scopes
   ; links := <map(scope-to-json-links); concat; to-json-list> scopes
