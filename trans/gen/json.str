@@ -25,7 +25,7 @@ rules
   with
     relations := <filter(scope-elem-is-relations); concat; map(relation-to-json); to-json-list> elems
   scope-to-json-links: Scope(name, elems) -> 
-    <filter(scope-elem-is-edges); concat; map-with-param(edge-to-json-link|name)> elems
+    <filter(scope-elem-is-edges); concat; map-with-param(edge-to-json-links|name); concat> elems
 
   scope-elem-is-relations: ScopeElement("relations", relations) -> relations
   scope-elem-is-edges: ScopeElement("edges", edges) -> edges
@@ -36,11 +36,13 @@ rules
   ; values := <map(aterm-to-json); to-json-list> elems
   ; result  := $[{"name": "[name]", "values": [values]}]
 
-  edge-to-json-link(|source): Declaration(id_path, [ScopeRef(scope_name)]) -> result
+  edge-to-json-links(|source): Declaration(id_path, scope_refs) -> result
   with
     label  := <idpath-to-id> id_path
-  ; target := <scoperef-to-id> scope_name
-  ; result := $[{"source": "[source]", "target": "[target]", "label": "[label]"}]
+  ; result := <map-with-param(edge-to-json-link|(source, label))> scope_refs
+
+  edge-to-json-link(|(source, label)): ScopeRef(scope_name) ->
+    $[{"source": "[source]", "target": "[<scoperef-to-id> scope_name]", "label": "[label]"}]
 
   idpath-to-id: WithPath(_, name) -> name
   idpath-to-id: NoPath(name) -> name
