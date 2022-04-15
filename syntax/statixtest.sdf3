@@ -79,5 +79,6 @@ lexical syntax
   SCOPEID            = "#" PATH? "-" ID "-" INT
   UNRESOLVED_SCOPEID = "?" PATH? "-" ID "-" INT
   PATH = PATHID ("/" PATHID)*
+  PATH = "/"
   PATHID = [A-Za-z0-9\_\-\.]+
   REST = (~[])+ EOF
